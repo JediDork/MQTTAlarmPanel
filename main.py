@@ -7,6 +7,7 @@ import random
 import json
 import os.path
 import datetime
+import threading
 from kivy.app import App
 from kivy.config import Config
 from kivy.lang import Builder
@@ -68,6 +69,21 @@ except Exception:
 Config.set('graphics', 'width', screen_res_x)
 Config.set('graphics', 'height', screen_res_y)
 
+# Threaded Piezo loop to avoid stalling the GUI when buttons are pressed
+def makeBeep(length):
+    if (length == 0):
+        try:
+            GPIO.output(buzzerPin, 0)
+        except Exception:
+            print (gpio_warning)
+    else:
+        try:
+            GPIO.output(buzzerPin, 1)
+            time.sleep(length)
+            GPIO.output(buzzerPin, 0)
+        except Exception:
+            print (gpio_warning)
+
 # Progress bar callback for when "PENDING" is displayed 
 def progBar(dt):
     global buzzerPin
@@ -99,17 +115,6 @@ def dimmer_checker(dt):
     global bl_warning
     curtime = datetime.datetime.now()
     curtime = curtime.strftime("%H:%M:%S")
-    #print ("Current time:", curtime)
-    #print ("Night time:", dimmer_night)
-    #print ("Day time:", dimmer_day)
-    #if (curtime > dimmer_night):
-    #    print ("It is currently past night time")
-    #else:
-    #    print ("It is currently before night time")
-    #if (curtime > dimmer_day):
-    #    print ("It is currently past day time")
-    #else:
-    #    print ("It is currently before day time")
 
     if ((curtime > dimmer_night) & (curtime > dimmer_day)) | ((curtime < dimmer_night) & (curtime < dimmer_day)):
         print("[INFO   ] Night Mode Active")
@@ -216,9 +221,8 @@ class AlarmGridLayout(GridLayout):
 
             App.get_running_app().root.ids.entry.text = ""
             try:
-                GPIO.output(buzzerPin, 1)
-                time.sleep(0.8)
-                GPIO.output(buzzerPin, 0)
+                piezoBeep = threading.Thread(makeBeep, 0.8)
+                piezoBeep.start()
             except Exception:
                 print (gpio_warning)
 
