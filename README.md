@@ -6,12 +6,19 @@ MQTT Alarm Panel is a UI built using Kivy for the Raspberry Pi. While the applic
 2. Control of Manual MQTT Alarm in Home Assistant thanks to paho-mqtt
 3. GPIO control for a Piezo Buzzer
 4. Screensaver for night mode
-4. Settings menu (currently in development)
+5. Settings menu (currently in development - half way there)
 
 # Usage
 The settings are currently hard-coded. After you have cloned the repo, edit main.py and change lines 22-48 as required.
 
-You can change the background simply by changing bg.jpg to an image of your choosing
+Notes:
+Some modules may need to be installed prior. Ensure you have the following modules:
+- sudo pip install RPi.GPIO
+- sudo pip install rpi_backlight
+
+Obviously Kivy and Python needs to be installed too - see https://kivy.org/docs/installation/installation-rpi.html
+
+You can change App background simply by changing bg.jpg to an image of your choosing
 
 # Currently in Development
 1. Settings menu to save config and avoid hard-coding.
