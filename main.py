@@ -6,6 +6,7 @@ import time
 import random
 import json
 import os.path
+import datetime
 from kivy.app import App
 from kivy.config import Config
 from kivy.lang import Builder
@@ -39,8 +40,16 @@ buzzerPin = 18
 sentText = "Update Sent"
 failText = "Update Failed"
 gpio_warning = "[WARNING] GPIO not connected"
+bl_warning = "[WARNING] BACKLIGHT not connected"
 
+# Raspberry Pi Backlight control. Goes dim after a set time, then returns after a set time
+# dimmer_night: Screen will dim after this time. Format is hour, minutes, seconds
+dimmer_night = datetime.time(22, 00, 00)
+dimmer_day = datetime.time(6, 30, 00)
 
+# Leave these values alone!
+dimmer_night = dimmer_night.strftime("%H:%M:%S")
+dimmer_day = dimmer_day.strftime("%H:%M:%S")
 
 try:
     import RPi.GPIO as GPIO
@@ -49,6 +58,11 @@ try:
     GPIO.output(buzzerPin, 0)
 except Exception:
     print("Error importing RPi.GPIO. try SUDO or make sure RPi.GPIO module is installed.")
+
+try:
+    import rpi_backlight as bl
+except Exception:
+    print("Error starting backlight. Try SUDO or make sure rpi_backlight module is installed.")
 
 # Set graphic display
 Config.set('graphics', 'width', screen_res_x)
@@ -79,6 +93,24 @@ def progBar(dt):
         except Exception:
             print (gpio_warning)
 
+def dimmer_checker(dt):
+    global dimmer_day
+    global dimmer_night
+    global bl_warning
+    curtime = datetime.datetime.now()
+    if (curtime.strftime("%H:%M:%S") > dimmer_night) & (curtime.strftime("%H:%M:%S") < dimmer_day):
+        print("[INFO   ] Night Mode Active")
+        try:
+            bl.set_brightness(20, smooth=True, duration=10)
+        except Exception:
+            print(bl_warning)
+    else:
+        print("[INFO   ] Day Mode Active")
+        try:
+            bl.set_brightness(255, smooth=True, duration=10)
+        except Exception:
+            print(bl_warning)
+
 def on_message(client, userdata, message):
     try:
         print("[INFO   ] MQTT Message: " ,str(message.payload.decode("utf-8")))
@@ -96,7 +128,7 @@ client.connect(broker_address,broker_port) #connect to broker
 client.on_message=on_message
 client.subscribe(broker_statetopic)
 client.loop_start()
-
+doDimmer = Clock.schedule_interval(dimmer_checker, 60)
 
 #from kivy.animation import Animation
 #from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
