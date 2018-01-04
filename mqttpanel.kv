@@ -154,8 +154,16 @@
             text: "ARM / DISARM Code"
         TextInput:
             id: alarm_code
-            password: True
+            password: False
             text: "1230"
+        Label:
+            text: "Screen Brightness"
+        Slider:
+            id: screen_brightness
+            min: "20"
+            max: "255"
+            value: "100"
+            on_value: MPopup.changeSlider(self.value)  
         Label:
         Label:
         Button:

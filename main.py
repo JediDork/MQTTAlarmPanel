@@ -156,10 +156,15 @@ doDimmer = Clock.schedule_interval(dimmer_checker, 60)
 #from kivy.lang import Builder
 
 class MenuPopup(Popup):
-    pass
+    def changeSlider(self, value):
+        global bl_warning
+        print (int(value))
+        try:    
+            bl.set_brightness(int(value))
+        except Exception:
+            print (bl_warning)
 
 class AlarmGridLayout(GridLayout):
-#class AlarmScreen(Screen):
     def checkCode(self, code, mode):
         global broker_address
         global broker_port
@@ -205,7 +210,6 @@ class AlarmGridLayout(GridLayout):
                     popup.ids.alarm_code.text = alarmCode
                     popup.ids.screen_x.text = screen_res_x
                     popup.ids.screen_y.text = screen_res_y
-
                     popup.open()
                 else:
                     App.get_running_app().root.ids.status.text = failText
