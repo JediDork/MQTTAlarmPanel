@@ -71,6 +71,7 @@ Config.set('graphics', 'height', screen_res_y)
 
 # Threaded Piezo loop to avoid stalling the GUI when buttons are pressed
 def makeBeep(length):
+    global buzzerPin
     if (length == 0):
         try:
             GPIO.output(buzzerPin, 0)
@@ -230,10 +231,8 @@ class AlarmGridLayout(GridLayout):
         global gpio_warning
         self.display.text += btn
         try:
-            global buzzerPin
-            GPIO.output(buzzerPin, 1)
-            time.sleep(0.2)
-            GPIO.output(buzzerPin, 0)
+            piezoBeep = threading.Thread(makeBeep, 0.2)
+            piezoBeep.start()
         except Exception:
             print (gpio_warning)
 
