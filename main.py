@@ -4,7 +4,7 @@ kivy.require("1.9.0")
 import sys
 import time
 import random
-import json
+import yaml
 import os.path
 import datetime
 import threading
@@ -33,6 +33,7 @@ broker_port = 1883
 broker_clientid = str(random.randint(1000,10000))
 broker_statetopic = "home/alarm"
 broker_comtopic = "home/alarm/set"
+broker_lastmsg = ""
 
 # GPIO setup. Use BCM pin numbering (i.e GPIO18 = 18)
 buzzerPin = 18
@@ -136,6 +137,7 @@ def on_message(client, userdata, message):
         msgPreformat = str(message.payload.decode("utf-8")) 
         msgFormatted = str.replace(msgPreformat,"_"," ").upper()
         App.get_running_app().root.ids.status.text = msgFormatted
+        broker_lastmsg = msgFormatted
         if (msgFormatted == "PENDING"):
             App.get_running_app().root.ids.bar.value = 0
             App.get_running_app().root.ids.bar.max = 60
@@ -239,6 +241,10 @@ class AlarmGridLayout(GridLayout):
 class MQTTPanelApp(App):
     def build(self):
         return AlarmGridLayout()
+
+    def on_start(self, **kwargs):
+        global broker_lastmsg
+        App.get_running_app().root.ids.status.text = broker_lastmsg
 
 MQTTApp = MQTTPanelApp()
 MQTTApp.run()
