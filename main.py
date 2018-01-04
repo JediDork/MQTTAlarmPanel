@@ -98,7 +98,20 @@ def dimmer_checker(dt):
     global dimmer_night
     global bl_warning
     curtime = datetime.datetime.now()
-    if (curtime.strftime("%H:%M:%S") > dimmer_night) & (curtime.strftime("%H:%M:%S") < dimmer_day):
+    curtime = curtime.strftime("%H:%M:%S")
+    #print ("Current time:", curtime)
+    #print ("Night time:", dimmer_night)
+    #print ("Day time:", dimmer_day)
+    #if (curtime > dimmer_night):
+    #    print ("It is currently past night time")
+    #else:
+    #    print ("It is currently before night time")
+    #if (curtime > dimmer_day):
+    #    print ("It is currently past day time")
+    #else:
+    #    print ("It is currently before day time")
+
+    if ((curtime > dimmer_night) & (curtime > dimmer_day)) | ((curtime < dimmer_night) & (curtime < dimmer_day)):
         print("[INFO   ] Night Mode Active")
         try:
             bl.set_brightness(20, smooth=True, duration=10)
