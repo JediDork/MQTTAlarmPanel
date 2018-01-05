@@ -24,7 +24,6 @@ import paho.mqtt.client as mqtt
 # Settings file now implemented. Refer to settings.yaml and try to avoid changing the code below
 # TODO: Hard-code appSetting variables directly to the command, instead of referring through a 3rd variable
 cwd = os.path.dirname(os.path.abspath(__file__))
-print(cwd)
 with open(cwd + "/settings.yaml", 'r') as ymlfile:
     appSettings = yaml.load(ymlfile)
 
@@ -203,7 +202,8 @@ class MenuPopup(Popup):
         appSettings['dimmer']['day_sec'] = int(self.ids.day_sec.text)
         appSettings['dimmer']['night_value'] = int(self.ids.night_value.value)
         appSettings['dimmer']['day_value'] = int(self.ids.day_value.value)
-        with open('settings.yaml', 'w') as outfile:
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        with open(cwd + '/settings.yaml', 'w') as outfile:
             yaml.dump(appSettings, outfile, default_flow_style=False)
         popup2 = RestartPopup()
         popup2.open()
