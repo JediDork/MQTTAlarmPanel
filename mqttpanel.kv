@@ -126,6 +126,17 @@
             id: mqtt_port
             text: "1883"
         Label:
+            text: "MQTT User"
+        TextInput:
+            id: mqtt_username
+            text: ""
+        Label:
+            text: "MQTT Password"
+        TextInput:
+            id: mqtt_pass
+            text: ""
+            password: True
+        Label:
             text: "HASS State Topic"
         TextInput:
             id: mqtt_state
@@ -157,18 +168,72 @@
             password: False
             text: "1230"
         Label:
-            text: "Screen Brightness"
+            text: "Start Night Mode"
+        BoxLayout:
+            orientation: 'horizontal'
+            Spinner:
+                id: night_hour
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23')
+            Spinner:
+                id: night_min
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
+            Spinner:
+                id: night_sec
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
+        Label:
+            text: "End Night Mode"
+        BoxLayout:
+            orientation: 'horizontal'
+            Spinner:
+                id: day_hour
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23')
+            Spinner:
+                id: day_min
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
+            Spinner:
+                id: day_sec
+                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
+        Label:
+            text: "Night Mode Brightness"
         Slider:
-            id: screen_brightness
-            min: "20"
+            id: night_value
+            min: "1"
+            max: "255"
+            value: "100"
+            on_value: MPopup.changeSlider(self.value)  
+        Label:
+            text: "Day Mode Brightness"
+        Slider:
+            id: day_value
+            min: "1"
             max: "255"
             value: "100"
             on_value: MPopup.changeSlider(self.value)  
         Label:
         Label:
         Button:
+            id: left_button
             text: "Apply"
-            on_press: root.dismiss()
+            on_press: MPopup.checkLeftBtn(self.text)
         Button:
-            text: "Cancel"
+            id: right_button
+            text: "Close"
             on_press: root.dismiss()
+            
+<RestartPopup>:
+    id: RPopup
+    title: "Settings Changed"
+    size_hint: .7, .7
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Settings will not take effect until restart. Would you like to restart now?"
+        BoxLayout:
+            Button:
+                text: "Yes"
+                on_press: RPopup.doRestart()
+            Button:
+                text: "No"
+                on_press: root.dismiss()
+                    

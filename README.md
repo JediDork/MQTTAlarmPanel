@@ -12,14 +12,15 @@ MQTT Alarm Panel is a UI built using Kivy for the Raspberry Pi. While the applic
 The settings are currently hard-coded. After you have cloned the repo, edit main.py and change lines 22-48 as required.
 
 Notes:
-Some modules may need to be installed prior. Ensure you have the following modules:
+Some modules may need to be installed prior. Ensure you have the following before you run the application:
 - sudo pip install RPi.GPIO
 - sudo pip install rpi_backlight
 - sudo pip install paho-mqtt
+- sudo pip install pyyaml
 
 Obviously Kivy and Python need to be installed too - see https://kivy.org/docs/installation/installation-rpi.html
 
-The seetinigs menu can be reached by typing your alarm code + * on the interface. As mentioned it is not complete but will be soon!
+The settings menu can be reached by typing your alarm code + * on the interface. As mentioned it is not complete but will be soon!
 
 # Currently in Development
 1. Settings menu to save config and avoid hard-coding.

@@ -1,32 +1,28 @@
-screen:
-	x: "800"
-	y: "480"
-
-piezo:
-	pin: 18
-
 alarm:
-	code: "1230"
-
-mqtt:
-	broker: "10.1.1.75"
-	port: 1883
-	username: "av"
-	pass: "av"
-	state_topic: "home/alarm"
-	com_topic: "home/alarm/set"
-	sent: ""
-	fail: "MQTT Messaging Failed"
-
+  code: '1230'
 dimmer:
-	value: 100
-	night_hour: 22
-	night_min: 00
-	night_sec: 00
-	day_hour: 6
-	day_min: 30
-	day_sec: 00
-
+  day_hour: 6
+  day_min: 30
+  day_sec: 0
+  day_value: 200
+  night_hour: 22
+  night_min: 0
+  night_sec: 0
+  night_value: 33.10674157303375
+mqtt:
+  broker: 10.1.1.75
+  com_topic: home/alarm/set
+  fail: MQTT Messaging Failed
+  pass: av
+  port: 1883
+  sent: ''
+  state_topic: home/alarm
+  username: av
+piezo:
+  pin: '18'
+screen:
+  x: '800'
+  y: '480'
 warnings:
-	gpio: "[WARNING] GPIO not connected"
-	backlight: "[WARNING] BACKLIGHT not connected"
+  backlight: '[WARNING] BACKLIGHT not connected'
+  gpio: '[WARNING] GPIO not connected'

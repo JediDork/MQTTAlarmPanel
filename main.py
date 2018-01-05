@@ -20,34 +20,39 @@ from kivy.uix.label import Label
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 
+# Settings file now implemented. Refer to settings.yaml and try to avoid changing the code below
+# TODO: Hard-code appSetting variables directly to the command, instead of referring through a 3rd variable
+with open("settings.yaml", 'r') as ymlfile:
+    appSettings = yaml.load(ymlfile)
+
 # Screen setup. Official RPi touch screen is 800(x) x 480(y)
-screen_res_x = "800"
-screen_res_y = "480"
+screen_res_x = appSettings['screen']['x']
+screen_res_y = appSettings['screen']['y']
 
 # Alarm Setup. 0-9. Can be any length!
-alarmCode = "1230"
+alarmCode = appSettings['alarm']['code']
 
 # MQTT setup
-broker_address = "10.1.1.75"
-broker_port = 1883
+broker_address = appSettings['mqtt']['broker']
+broker_port = appSettings['mqtt']['port']
 broker_clientid = str(random.randint(1000,10000))
-broker_statetopic = "home/alarm"
-broker_comtopic = "home/alarm/set"
+broker_statetopic = appSettings['mqtt']['state_topic']
+broker_comtopic = appSettings['mqtt']['com_topic']
 broker_lastmsg = ""
 
 # GPIO setup. Use BCM pin numbering (i.e GPIO18 = 18)
-buzzerPin = 18
+buzzerPin = appSettings['piezo']['pin']
 
 # Text updates for UI and Backend. Change if you want.
-sentText = "Update Sent"
-failText = "Update Failed"
-gpio_warning = "[WARNING] GPIO not connected"
-bl_warning = "[WARNING] BACKLIGHT not connected"
+sentText = appSettings['mqtt']['sent']
+failText = appSettings['mqtt']['fail']
+gpio_warning = appSettings['warnings']['gpio']
+bl_warning = appSettings['warnings']['backlight']
 
 # Raspberry Pi Backlight control. Goes dim after a set time, then returns after a set time
 # dimmer_night: Screen will dim after this time. Format is hour, minutes, seconds
-dimmer_night = datetime.time(22, 00, 00)
-dimmer_day = datetime.time(6, 30, 00)
+dimmer_night = datetime.time(appSettings['dimmer']['night_hour'], appSettings['dimmer']['night_min'], appSettings['dimmer']['night_sec'])
+dimmer_day = datetime.time(appSettings['dimmer']['day_hour'], appSettings['dimmer']['day_min'], appSettings['dimmer']['day_sec'])
 
 # Leave these values alone!
 dimmer_night = dimmer_night.strftime("%H:%M:%S")
@@ -63,6 +68,7 @@ except Exception:
 
 try:
     import rpi_backlight as bl
+    bl.set_brightness(appSettings['dimmer']['day_value'])
 except Exception:
     print("Error starting backlight. Try SUDO or make sure rpi_backlight module is installed.")
 
@@ -121,13 +127,13 @@ def dimmer_checker(dt):
     if ((curtime > dimmer_night) & (curtime > dimmer_day)) | ((curtime < dimmer_night) & (curtime < dimmer_day)):
         print("[INFO   ] Night Mode Active")
         try:
-            bl.set_brightness(20, smooth=True, duration=10)
+            bl.set_brightness(appSettings['dimmer']['night_value'], smooth=True, duration=10)
         except Exception:
             print(bl_warning)
     else:
         print("[INFO   ] Day Mode Active")
         try:
-            bl.set_brightness(255, smooth=True, duration=10)
+            bl.set_brightness(appSettings['dimmer']['day_value'], smooth=True, duration=10)
         except Exception:
             print(bl_warning)
 
@@ -151,17 +157,17 @@ client.subscribe(broker_statetopic)
 client.loop_start()
 doDimmer = Clock.schedule_interval(dimmer_checker, 60)
 
-#from kivy.animation import Animation
-#from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
-#from kivy.uix.switch import Switch
-#from kivy.uix.widget import Widget
-#from kivy.uix.button import Button
-#from kivy.uix.togglebutton import ToggleButton
-#from kivy.uix.image import Image
-#from kivy.uix.textinput import TextInput
-#from kivy.clock import Clock
-#from kivy.factory import Factory
-#from kivy.lang import Builder
+class RestartPopup(Popup):
+    def doRestart(self):
+        try:
+            p = psutil.Process(os.getpid())
+            for handler in p.get_open_files() + p.connections():
+                os.close(handler.fd)
+        except Exception as e:
+            print ("[WARNING] ", e)
+
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
 class MenuPopup(Popup):
     def changeSlider(self, value):
@@ -172,8 +178,34 @@ class MenuPopup(Popup):
         except Exception:
             print (bl_warning)
 
+    def checkLeftBtn(self, labelText):
+        appSettings['mqtt']['broker'] = self.ids.mqtt_host.text
+        appSettings['mqtt']['port'] = int(self.ids.mqtt_port.text)
+        appSettings['mqtt']['username'] = self.ids.mqtt_username.text
+        appSettings['mqtt']['pass'] = self.ids.mqtt_pass.text
+        appSettings['mqtt']['state_topic'] = self.ids.mqtt_state.text
+        appSettings['mqtt']['com_topic'] = self.ids.mqtt_com.text
+        appSettings['piezo']['pin'] = self.ids.buzzer_pin.text
+        appSettings['alarm']['code'] = self.ids.alarm_code.text
+        appSettings['screen']['x'] = self.ids.screen_x.text
+        appSettings['screen']['y'] = self.ids.screen_y.text
+        appSettings['dimmer']['night_hour'] = int(self.ids.night_hour.text)
+        appSettings['dimmer']['night_min'] = int(self.ids.night_min.text)
+        appSettings['dimmer']['night_sec'] = int(self.ids.night_sec.text)
+        appSettings['dimmer']['day_hour'] = int(self.ids.day_hour.text)
+        appSettings['dimmer']['day_min'] = int(self.ids.day_min.text) 
+        appSettings['dimmer']['day_sec'] = int(self.ids.day_sec.text)
+        appSettings['dimmer']['night_value'] = self.ids.night_value.value
+        appSettings['dimmer']['day_value'] = self.ids.day_value.value
+        with open('settings.yaml', 'w') as outfile:
+            yaml.dump(appSettings, outfile, default_flow_style=False)
+        popup2 = RestartPopup()
+        popup2.open()
+        self.dismiss()
+
 class AlarmGridLayout(GridLayout):
     def checkCode(self, code, mode):
+        global broker_lastmsg
         global broker_address
         global broker_port
         global broker_statetopic
@@ -185,42 +217,43 @@ class AlarmGridLayout(GridLayout):
         global sentText
         global failText
         global alarmCode
+        global appSettings
         if code:
             if (self.display.text == alarmCode):
                 if (mode == "ARM_AWAY"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
-                else:
-                    App.get_running_app().root.ids.status.text = failText
                 if (mode == "ARM_HOME"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
-                else:
-                    App.get_running_app().root.ids.status.text = failText
                 if (mode == "ARM_NIGHT"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
-                else:
-                    App.get_running_app().root.ids.status.text = failText
                 if (mode == "DISARM"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
-                else:
-                    App.get_running_app().root.ids.status.text = failText
                 if (mode == "SETTINGS"):
                     # Display settings screen
                     popup = MenuPopup()
-                    popup.ids.mqtt_host.text = broker_address
-                    popup.ids.mqtt_port.text = str(broker_port)
-                    popup.ids.mqtt_state.text = broker_statetopic
-                    popup.ids.mqtt_com.text = broker_comtopic
-                    popup.ids.buzzer_pin.text = str(buzzerPin)
-                    popup.ids.alarm_code.text = alarmCode
-                    popup.ids.screen_x.text = screen_res_x
-                    popup.ids.screen_y.text = screen_res_y
+                    popup.ids.mqtt_host.text = appSettings['mqtt']['broker']
+                    popup.ids.mqtt_port.text = str(appSettings['mqtt']['port'])
+                    popup.ids.mqtt_username.text = appSettings['mqtt']['username']
+                    popup.ids.mqtt_pass.text = appSettings['mqtt']['pass']
+                    popup.ids.mqtt_state.text = appSettings['mqtt']['state_topic']
+                    popup.ids.mqtt_com.text = appSettings['mqtt']['com_topic']
+                    popup.ids.buzzer_pin.text = str(appSettings['piezo']['pin'])
+                    popup.ids.alarm_code.text = appSettings['alarm']['code']
+                    popup.ids.screen_x.text = appSettings['screen']['x']
+                    popup.ids.screen_y.text = appSettings['screen']['y']
+                    popup.ids.night_hour.text = str(appSettings['dimmer']['night_hour'])
+                    popup.ids.night_min.text = str(appSettings['dimmer']['night_min'])
+                    popup.ids.night_sec.text = str(appSettings['dimmer']['night_sec'])
+                    popup.ids.day_hour.text = str(appSettings['dimmer']['day_hour'])
+                    popup.ids.day_min.text = str(appSettings['dimmer']['day_min'])
+                    popup.ids.day_sec.text = str(appSettings['dimmer']['day_sec'])
+                    popup.ids.night_value.value = appSettings['dimmer']['night_value']
+                    popup.ids.day_value.value = appSettings['dimmer']['day_value']
                     popup.open()
-                else:
-                    App.get_running_app().root.ids.status.text = failText
 
             App.get_running_app().root.ids.entry.text = ""
             try:
@@ -244,7 +277,10 @@ class MQTTPanelApp(App):
 
     def on_start(self, **kwargs):
         global broker_lastmsg
-        App.get_running_app().root.ids.status.text = broker_lastmsg
+        if (broker_lastmsg == ""):
+            App.get_running_app().root.ids.status.text = "ARM/DISARM TO BEGIN"
+        else:
+            App.get_running_app().root.ids.status.text = broker_lastmsg
 
 MQTTApp = MQTTPanelApp()
 MQTTApp.run()
