@@ -120,53 +120,63 @@
         TextInput:
             id: mqtt_host
             text: "127.0.0.1"
+            font_size: 12
         Label:
             text: "MQTT Port"
         TextInput:
             id: mqtt_port
             text: "1883"
+            font_size: 12
         Label:
             text: "MQTT User"
         TextInput:
             id: mqtt_username
             text: ""
+            font_size: 12
         Label:
             text: "MQTT Password"
         TextInput:
             id: mqtt_pass
+            font_size: 12
             text: ""
             password: True
         Label:
             text: "HASS State Topic"
         TextInput:
             id: mqtt_state
+            font_size: 12
             text: "home/alarm"
         Label:
             text: "HASS Command Topic"
         TextInput:
             id: mqtt_com
+            font_size: 12
             text: "home/alarm/set"
         Label:
             text: "Buzzer GPIO Pin"
         TextInput:
             id: buzzer_pin
+            font_size: 12
             text: "18"
         Label:
             text: "Screen Width"
         TextInput:
             id: screen_x
             text: "800"
+            font_size: 12
         Label:
             text: "Screen Height"
         TextInput:
             id: screen_y
             text: "480"
+            font_size: 12
         Label:
             text: "ARM / DISARM Code"
         TextInput:
             id: alarm_code
             password: False
             text: "1230"
+            font_size: 12
         Label:
             text: "Start Night Mode"
         BoxLayout:
@@ -223,7 +233,7 @@
 <RestartPopup>:
     id: RPopup
     title: "Settings Changed"
-    size_hint: .7, .7
+    size_hint: .7, .5
     auto_dismiss: False
     BoxLayout:
         orientation: 'vertical'

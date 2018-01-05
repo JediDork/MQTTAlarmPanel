@@ -28,6 +28,13 @@ Obviously Kivy and Python need to be installed too - see https://kivy.org/docs/i
 
 The settings menu can be reached by typing your alarm code + * on the interface.
 
+On Screen Keyboard:
+The easiest way to do this is to run the keyboard kivy example. Depending on how you installed kivy, the examples will be in your home directory or under cd /usr/local/share/kivy-examples/. This works for me:
+
+1. sudo python /usr/local/share/kivy-examples/keyboard/main.py
+2. Change the Current Keyboard Setting to "systemanddock", hit Set, then exit and reboot your pi
+3. Now when you tap on a textbox it should show the system keyboard!
+
 # Screenshots
 ![alt text](Screenshot.png)   ![alt text](Screenshot2.png)
 

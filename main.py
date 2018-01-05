@@ -163,6 +163,8 @@ doDimmer = Clock.schedule_interval(dimmer_checker, 60)
 
 class RestartPopup(Popup):
     def doRestart(self):
+        os.system("sudo shutdown -r 1")
+        print("Rebooting in 60 seconds...")
         try:
             p = psutil.Process(os.getpid())
             for handler in p.get_open_files() + p.connections():
