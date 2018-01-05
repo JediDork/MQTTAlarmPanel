@@ -21,12 +21,11 @@ from kivy.uix.label import Label
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 
-cwd = os.getcwd()
-print(cwd)
-
 # Settings file now implemented. Refer to settings.yaml and try to avoid changing the code below
 # TODO: Hard-code appSetting variables directly to the command, instead of referring through a 3rd variable
-with open(cwd + "\settings.yaml", 'r') as ymlfile:
+cwd = os.path.dirname(os.path.abspath(__file__))
+print(cwd)
+with open(cwd + "/settings.yaml", 'r') as ymlfile:
     appSettings = yaml.load(ymlfile)
 
 # Screen setup. Official RPi touch screen is 800(x) x 480(y)
@@ -67,8 +66,9 @@ try:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(buzzerPin, GPIO.OUT)
     GPIO.output(buzzerPin, 0)
-except Exception:
+except Exception as e:
     print("Error importing RPi.GPIO. try SUDO or make sure RPi.GPIO module is installed.")
+    print(e)
 
 try:
     import rpi_backlight as bl
