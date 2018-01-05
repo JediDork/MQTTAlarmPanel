@@ -183,24 +183,24 @@ class MenuPopup(Popup):
             print (bl_warning)
 
     def checkLeftBtn(self, labelText):
-        appSettings['mqtt']['broker'] = self.ids.mqtt_host.text
+        appSettings['mqtt']['broker'] = str(self.ids.mqtt_host.text)
         appSettings['mqtt']['port'] = int(self.ids.mqtt_port.text)
-        appSettings['mqtt']['username'] = self.ids.mqtt_username.text
-        appSettings['mqtt']['pass'] = self.ids.mqtt_pass.text
-        appSettings['mqtt']['state_topic'] = self.ids.mqtt_state.text
-        appSettings['mqtt']['com_topic'] = self.ids.mqtt_com.text
-        appSettings['piezo']['pin'] = self.ids.buzzer_pin.text
-        appSettings['alarm']['code'] = self.ids.alarm_code.text
-        appSettings['screen']['x'] = self.ids.screen_x.text
-        appSettings['screen']['y'] = self.ids.screen_y.text
+        appSettings['mqtt']['username'] = str(self.ids.mqtt_username.text)
+        appSettings['mqtt']['pass'] = str(self.ids.mqtt_pass.text)
+        appSettings['mqtt']['state_topic'] = str(self.ids.mqtt_state.text)
+        appSettings['mqtt']['com_topic'] = str(self.ids.mqtt_com.text)
+        appSettings['piezo']['pin'] = int(self.ids.buzzer_pin.text)
+        appSettings['alarm']['code'] = str(self.ids.alarm_code.text)
+        appSettings['screen']['x'] = str(self.ids.screen_x.text)
+        appSettings['screen']['y'] = str(self.ids.screen_y.text)
         appSettings['dimmer']['night_hour'] = int(self.ids.night_hour.text)
         appSettings['dimmer']['night_min'] = int(self.ids.night_min.text)
         appSettings['dimmer']['night_sec'] = int(self.ids.night_sec.text)
         appSettings['dimmer']['day_hour'] = int(self.ids.day_hour.text)
         appSettings['dimmer']['day_min'] = int(self.ids.day_min.text) 
         appSettings['dimmer']['day_sec'] = int(self.ids.day_sec.text)
-        appSettings['dimmer']['night_value'] = self.ids.night_value.value
-        appSettings['dimmer']['day_value'] = self.ids.day_value.value
+        appSettings['dimmer']['night_value'] = int(self.ids.night_value.value)
+        appSettings['dimmer']['day_value'] = int(self.ids.day_value.value)
         with open('settings.yaml', 'w') as outfile:
             yaml.dump(appSettings, outfile, default_flow_style=False)
         popup2 = RestartPopup()

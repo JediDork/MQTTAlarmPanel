@@ -8,7 +8,7 @@ dimmer:
   night_hour: 22
   night_min: 0
   night_sec: 0
-  night_value: 33.10674157303375
+  night_value: 33
 mqtt:
   broker: 10.1.1.75
   com_topic: home/alarm/set
@@ -19,7 +19,7 @@ mqtt:
   state_topic: home/alarm
   username: av
 piezo:
-  pin: '18'
+  pin: 23
 screen:
   x: '800'
   y: '480'
