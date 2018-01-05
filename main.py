@@ -261,7 +261,7 @@ class AlarmGridLayout(GridLayout):
 
             App.get_running_app().root.ids.entry.text = ""
             try:
-                piezoBeep = threading.Thread(makeBeep, 0.8)
+                piezoBeep = threading.Thread(makeBeep(0.8))
                 piezoBeep.start()
             except Exception:
                 print (gpio_warning)
@@ -270,7 +270,7 @@ class AlarmGridLayout(GridLayout):
         global gpio_warning
         self.display.text += btn
         try:
-            piezoBeep = threading.Thread(makeBeep, 0.2)
+            piezoBeep = threading.Thread(makeBeep(0.2))
             piezoBeep.start()
         except Exception:
             print (gpio_warning)
