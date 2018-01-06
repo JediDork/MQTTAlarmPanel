@@ -5,6 +5,8 @@ import sys
 import time
 import random
 import yaml
+import io
+import urllib
 import os.path
 import os
 import datetime
@@ -15,11 +17,15 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
+from kivy.properties import StringProperty
+from kivy.core.image import Image as CoreImage
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 from kivy.uix.label import Label
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
+from collections import deque
 
 # Settings file now implemented. Refer to settings.yaml and try to avoid changing the code below
 # TODO: Hard-code appSetting variables directly to the command, instead of referring through a 3rd variable
@@ -160,6 +166,8 @@ client.subscribe(broker_statetopic)
 client.loop_start()
 doDimmer = Clock.schedule_interval(dimmer_checker, 60)
 
+
+
 class RestartPopup(Popup):
     def doRestart(self):
         os.system("sudo shutdown -r 1")
@@ -209,6 +217,55 @@ class MenuPopup(Popup):
         popup2.open()
         self.dismiss()
 
+class MjpegViewer(Image):
+
+    url = StringProperty()
+
+    def start(self):
+        self.quit = False
+        self._queue = deque()
+        self._thread = threading.Thread(target=self.read_stream)
+        self._thread.daemon = True
+        self._thread.start()
+        self._image_lock = threading.Lock()
+        self._image_buffer = None
+        Clock.schedule_interval(self.update_image, 1 / 30.)
+
+    def stop(self):
+        self.quit = True
+        self._thread.join()
+        Clock.unschedule(self.read_queue)
+
+    def read_stream(self):
+        stream = urllib.urlopen(self.url)
+        bytes = ''
+        while not self.quit:
+            bytes += stream.read(1024)
+            a = bytes.find('\xff\xd8')
+            b = bytes.find('\xff\xd9')
+            if a != -1 and b != -1:
+                jpg = bytes[a:b + 2]
+                bytes = bytes[b + 2:]
+
+                data = io.BytesIO(jpg)
+                im = CoreImage(data,
+                               ext="jpeg",
+                               nocache=True)
+                with self._image_lock:
+                    self._image_buffer = im
+
+    def update_image(self, *args):
+        im = None
+        with self._image_lock:
+            im = self._image_buffer
+            self._image_buffer = None
+        if im is not None:
+            self.texture = im.texture
+            self.texture_size = im.texture.size
+
+def Screensaver(Popup):
+    pass
+
 class AlarmGridLayout(GridLayout):
     def checkCode(self, code, mode):
         global broker_lastmsg
@@ -232,9 +289,19 @@ class AlarmGridLayout(GridLayout):
                 if (mode == "ARM_HOME"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
-                if (mode == "ARM_NIGHT"):
-                    client.publish(broker_comtopic,mode)
-                    App.get_running_app().root.ids.status.text = sentText
+                if (mode == "SCREENSAVER"):
+                    cam1 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=1&user=cam&pass=cam")
+                    cam1.start()
+                    cam2 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=3&user=cam&pass=cam")
+                    cam2.start()
+
+                    buildWidget = GridLayout()
+                    buildWidget.cols = 2
+                    buildWidget.add_widget(cam1)
+                    buildWidget.add_widget(cam2)
+
+                    popup = Popup(title='Camera View',content=buildWidget,size_hint=(1, 0.7),auto_dismiss=True)
+                    popup.open()
                 if (mode == "DISARM"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
