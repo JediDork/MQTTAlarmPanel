@@ -292,15 +292,11 @@ class AlarmGridLayout(GridLayout):
                 if (mode == "SCREENSAVER"):
                     cam1 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=1&user=cam&pass=cam")
                     cam1.start()
-                    cam2 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=3&user=cam&pass=cam")
-                    cam2.start()
-
                     buildWidget = GridLayout()
                     buildWidget.cols = 2
                     buildWidget.add_widget(cam1)
-                    buildWidget.add_widget(cam2)
 
-                    popup = Popup(title='Camera View',content=buildWidget,size_hint=(1, 0.7),auto_dismiss=True)
+                    popup = Popup(title='Camera View',content=buildWidget,size_hint=(0.9, 0.9),auto_dismiss=True)
                     popup.open()
                 if (mode == "DISARM"):
                     client.publish(broker_comtopic,mode)
