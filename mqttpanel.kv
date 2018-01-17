@@ -38,10 +38,15 @@
 						pos: entry.x + entry.width, 430
 						size: 2, entry.height
 			Label:
-				size_hint: (0.8, 1.0)
+				size_hint: (0.4, 1.0)
 				id: status
 				font_size: 20
 				text: "ARM & DISARM TO BEGIN"
+			Label:
+				size_hint: (0.4, 1.0)
+				id: dtime
+				font_size: 20
+				text: "PLEASE WAIT..."
 		ProgressBar:
 			id: bar
 			value: 0

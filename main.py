@@ -14,10 +14,14 @@ import threading
 from kivy.app import App
 from kivy.config import Config
 from kivy.lang import Builder
+from kivy.loader import Loader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
+from kivy.uix.image import AsyncImage
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
 from kivy.properties import StringProperty
 from kivy.core.image import Image as CoreImage
 from kivy.uix.popup import Popup
@@ -84,6 +88,10 @@ except Exception:
 # Set graphic display
 Config.set('graphics', 'width', screen_res_x)
 Config.set('graphics', 'height', screen_res_y)
+
+# Simple left function to aid in date/time formatting
+def left(s, amount):
+    return s[:amount]
 
 # Threaded Piezo loop to avoid stalling the GUI when buttons are pressed
 def makeBeep(length):
@@ -229,12 +237,12 @@ class MjpegViewer(Image):
         self._thread.start()
         self._image_lock = threading.Lock()
         self._image_buffer = None
-        Clock.schedule_interval(self.update_image, 1 / 30.)
+        Clock.schedule_interval(self.update_image, 1)
 
-    def stop(self):
+    def stop(self, var):
         self.quit = True
         self._thread.join()
-        Clock.unschedule(self.read_queue)
+        Clock.unschedule(self.update_image)
 
     def read_stream(self):
         stream = urllib.urlopen(self.url)
@@ -292,11 +300,11 @@ class AlarmGridLayout(GridLayout):
                 if (mode == "SCREENSAVER"):
                     cam1 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=1&user=cam&pass=cam")
                     cam1.start()
-                    buildWidget = GridLayout()
-                    buildWidget.cols = 2
+                    buildWidget = BoxLayout()
+                    buildWidget.orientation = 'vertical'
                     buildWidget.add_widget(cam1)
-
                     popup = Popup(title='Camera View',content=buildWidget,size_hint=(0.9, 0.9),auto_dismiss=True)
+                    popup.bind(on_dismiss=cam1.stop)
                     popup.open()
                 if (mode == "DISARM"):
                     client.publish(broker_comtopic,mode)
@@ -340,6 +348,11 @@ class AlarmGridLayout(GridLayout):
         except Exception:
             print (gpio_warning)
 
+class CrudeClock(Label):    
+    def update(self, *args):
+        today = time.asctime().upper()
+        App.get_running_app().root.ids.dtime.text = "                  " + left(today, (len(today) - 5)) # today.strftime('%a, %d %b %I : %m : %s')
+
 class MQTTPanelApp(App):
     def build(self):
         return AlarmGridLayout()
@@ -350,6 +363,8 @@ class MQTTPanelApp(App):
             App.get_running_app().root.ids.status.text = "ARM/DISARM TO BEGIN"
         else:
             App.get_running_app().root.ids.status.text = broker_lastmsg
+        clockwidget = CrudeClock()
+        Clock.schedule_interval(clockwidget.update, 1)
 
 MQTTApp = MQTTPanelApp()
 MQTTApp.run()
