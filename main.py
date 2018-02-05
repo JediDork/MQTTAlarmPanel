@@ -170,9 +170,10 @@ def on_message(client, userdata, message):
             doProg = Clock.schedule_interval(progBar, 0.5)
         elif (message.topic == "panel/backlight"):
             try:
-                bl.set_brightness(int(message.payload.decode("utf-8")), smooth=True, duration=10)
-            except Exception:
+                bl.set_brightness(int(message.payload.decode("utf-8")))
+            except Exception as e:
                 print(bl_warning)
+                print (e)
     except Exception as e: print(e)
 
 client = mqtt.Client(broker_clientid) #create new instance
