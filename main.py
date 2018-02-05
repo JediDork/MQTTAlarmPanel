@@ -156,11 +156,13 @@ def dimmer_checker(dt):
 
 def on_message(client, userdata, message):
     try:
+        global broker_statetopic
         print("[INFO   ] MQTT Message: " ,str(message.payload.decode("utf-8")))
         print("[INFO   ] MQTT Topic: " ,str(message.topic))
         msgPreformat = str(message.payload.decode("utf-8")) 
         msgFormatted = str.replace(msgPreformat,"_"," ").upper()
-        App.get_running_app().root.ids.status.text = msgFormatted
+        if (message.topic == broker_statetopic):
+            App.get_running_app().root.ids.status.text = msgFormatted
         broker_lastmsg = msgFormatted
         if (msgFormatted == "PENDING"):
             App.get_running_app().root.ids.bar.value = 0
@@ -168,7 +170,7 @@ def on_message(client, userdata, message):
             doProg = Clock.schedule_interval(progBar, 0.5)
         elif (message.topic == "panel/backlight"):
             try:
-                bl.set_brightness(str(message.payload.decode("utf-8")), smooth=True, duration=10)
+                bl.set_brightness(int(message.payload.decode("utf-8")), smooth=True, duration=10)
             except Exception:
                 print(bl_warning)
     except Exception as e: print(e)

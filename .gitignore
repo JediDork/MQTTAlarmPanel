@@ -1,3 +1,5 @@
 
 settings_test.yaml
 *.pyproj
+.vs/tp1/v15/.suo
+tp1.sln
