@@ -54,62 +54,110 @@
 	BoxLayout:
 		spacing: 10
 		CustButton:
-			text: "1"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("1")
+			Image:
+			    center: self.parent.center
+			    source: '1.png'
 		CustButton:
-			text: "2"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("2")
+			Image:
+			    center: self.parent.center
+			    source: '2.png'
 		CustButton:
-			text: "3"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("3")
+			Image:
+			    center: self.parent.center
+			    source: '3.png'
 		CustButton:
-			text: "ARM AWAY"
+			text: ""
 			on_press: alarmpanel.checkCode(entry.text, "ARM_AWAY")
+			Image:
+			    center: self.parent.center
+			    source: 'arm-away.png'
 
 	BoxLayout:
 		spacing: 10
 		CustButton:
-			text: "4"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("4")
+			Image:
+			    center: self.parent.center
+			    source: '4.png'
 		CustButton:
-			text: "5"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("5")
+			Image:
+			    center: self.parent.center
+			    source: '5.png'
 		CustButton:
-			text: "6"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("6")
+			Image:
+			    center: self.parent.center
+			    source: '6.png'
 		CustButton:
-			text: "ARM HOME"
+			text: ""
 			on_press: alarmpanel.checkCode(entry.text, "ARM_HOME")
+			Image:
+			    center: self.parent.center
+			    source: 'arm-home.png'
 
 	BoxLayout:
 		spacing: 10
 		CustButton:
-			text: "7"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("7")
+			Image:
+			    center: self.parent.center
+			    source: '7.png'
 		CustButton:
-			text: "8"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("8")
+			Image:
+			    center: self.parent.center
+			    source: '8.png'
 		CustButton:
-			text: "9"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("9")
+			Image:
+			    center: self.parent.center
+			    source: '9.png'
 		CustButton:
-			text: "CAMERAS"
+			text: ""
 			on_press: alarmpanel.checkCode(entry.text, "SCREENSAVER")
+			Image:
+			    center: self.parent.center
+			    source: 'cctv.png'
 
 	BoxLayout:
 		spacing: 10
 		CustButton:
-			text: "*"
+			text: ""
 			on_press: alarmpanel.checkCode(entry.text, "SETTINGS")
+			Image:
+			    center: self.parent.center
+			    source: 'settings.png'
 		CustButton:
-			text: "0"
-			on_press: alarmpanel.processBtn(self.text)
+			text: ""
+			on_press: alarmpanel.processBtn("0")
+			Image:
+			    center: self.parent.center
+			    source: '0.png'
 		CustButton:
-			text: "CLR"
+			text: ""
 			on_press: entry.text = ""
+			Image:
+			    center: self.parent.center
+			    source: 'close.png'
 		CustButton:
-			text: "DISARM"
+			text: ""
 			on_press: alarmpanel.checkCode(entry.text, "DISARM")
+			Image:
+			    center: self.parent.center
+			    source: 'disarm.png'
       
 <MenuPopup>:
     id: MPopup
@@ -181,49 +229,7 @@
             id: alarm_code
             password: False
             text: "1230"
-            font_size: 12
-        Label:
-            text: "Start Night Mode"
-        BoxLayout:
-            orientation: 'horizontal'
-            Spinner:
-                id: night_hour
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23')
-            Spinner:
-                id: night_min
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
-            Spinner:
-                id: night_sec
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
-        Label:
-            text: "End Night Mode"
-        BoxLayout:
-            orientation: 'horizontal'
-            Spinner:
-                id: day_hour
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23')
-            Spinner:
-                id: day_min
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
-            Spinner:
-                id: day_sec
-                values: ('0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59')
-        Label:
-            text: "Night Mode Brightness"
-        Slider:
-            id: night_value
-            min: "1"
-            max: "255"
-            value: "100"
-            on_value: MPopup.changeSlider(self.value)  
-        Label:
-            text: "Day Mode Brightness"
-        Slider:
-            id: day_value
-            min: "1"
-            max: "255"
-            value: "100"
-            on_value: MPopup.changeSlider(self.value)  
+            font_size: 12  
         Label:
         Label:
         Button:

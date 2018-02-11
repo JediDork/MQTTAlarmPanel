@@ -220,14 +220,14 @@ class MenuPopup(Popup):
         appSettings['alarm']['code'] = str(self.ids.alarm_code.text)
         appSettings['screen']['x'] = str(self.ids.screen_x.text)
         appSettings['screen']['y'] = str(self.ids.screen_y.text)
-        appSettings['dimmer']['night_hour'] = int(self.ids.night_hour.text)
-        appSettings['dimmer']['night_min'] = int(self.ids.night_min.text)
-        appSettings['dimmer']['night_sec'] = int(self.ids.night_sec.text)
-        appSettings['dimmer']['day_hour'] = int(self.ids.day_hour.text)
-        appSettings['dimmer']['day_min'] = int(self.ids.day_min.text) 
-        appSettings['dimmer']['day_sec'] = int(self.ids.day_sec.text)
-        appSettings['dimmer']['night_value'] = int(self.ids.night_value.value)
-        appSettings['dimmer']['day_value'] = int(self.ids.day_value.value)
+        #appSettings['dimmer']['night_hour'] = int(self.ids.night_hour.text)
+        #appSettings['dimmer']['night_min'] = int(self.ids.night_min.text)
+        #appSettings['dimmer']['night_sec'] = int(self.ids.night_sec.text)
+        #appSettings['dimmer']['day_hour'] = int(self.ids.day_hour.text)
+        #appSettings['dimmer']['day_min'] = int(self.ids.day_min.text) 
+        #appSettings['dimmer']['day_sec'] = int(self.ids.day_sec.text)
+        #appSettings['dimmer']['night_value'] = int(self.ids.night_value.value)
+        #appSettings['dimmer']['day_value'] = int(self.ids.day_value.value)
         cwd = os.path.dirname(os.path.abspath(__file__))
         with open(cwd + '/settings.yaml', 'w') as outfile:
             yaml.dump(appSettings, outfile, default_flow_style=False)
@@ -308,7 +308,7 @@ class AlarmGridLayout(GridLayout):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
                 if (mode == "SCREENSAVER"):
-                    cam1 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=1&user=cam&pass=cam")
+                    cam1 = MjpegViewer(url="http://10.1.1.75/cgi-bin/nph-zms?mode=jpeg&scale=100&maxfps=5&buffer=1000&monitor=4&user=cam&pass=cam")
                     cam1.start()
                     buildWidget = BoxLayout()
                     buildWidget.orientation = 'vertical'
@@ -316,6 +316,9 @@ class AlarmGridLayout(GridLayout):
                     popup = Popup(title='Camera View',content=buildWidget,size_hint=(0.9, 0.9),auto_dismiss=True)
                     popup.bind(on_dismiss=cam1.stop)
                     popup.open()
+                    clockwidget = CrudeClock()
+                    Clock.schedule_interval(clockwidget.update, 1)
+
                 if (mode == "DISARM"):
                     client.publish(broker_comtopic,mode)
                     App.get_running_app().root.ids.status.text = sentText
@@ -332,15 +335,17 @@ class AlarmGridLayout(GridLayout):
                     popup.ids.alarm_code.text = appSettings['alarm']['code']
                     popup.ids.screen_x.text = appSettings['screen']['x']
                     popup.ids.screen_y.text = appSettings['screen']['y']
-                    popup.ids.night_hour.text = str(appSettings['dimmer']['night_hour'])
-                    popup.ids.night_min.text = str(appSettings['dimmer']['night_min'])
-                    popup.ids.night_sec.text = str(appSettings['dimmer']['night_sec'])
-                    popup.ids.day_hour.text = str(appSettings['dimmer']['day_hour'])
-                    popup.ids.day_min.text = str(appSettings['dimmer']['day_min'])
-                    popup.ids.day_sec.text = str(appSettings['dimmer']['day_sec'])
-                    popup.ids.night_value.value = appSettings['dimmer']['night_value']
-                    popup.ids.day_value.value = appSettings['dimmer']['day_value']
+                    #popup.ids.night_hour.text = str(appSettings['dimmer']['night_hour'])
+                    #popup.ids.night_min.text = str(appSettings['dimmer']['night_min'])
+                    #popup.ids.night_sec.text = str(appSettings['dimmer']['night_sec'])
+                    #popup.ids.day_hour.text = str(appSettings['dimmer']['day_hour'])
+                    #popup.ids.day_min.text = str(appSettings['dimmer']['day_min'])
+                    #popup.ids.day_sec.text = str(appSettings['dimmer']['day_sec'])
+                    #popup.ids.night_value.value = appSettings['dimmer']['night_value']
+                    #popup.ids.day_value.value = appSettings['dimmer']['day_value']
                     popup.open()
+                    clockwidget = CrudeClock()
+                    Clock.schedule_interval(clockwidget.update, 1)
 
             App.get_running_app().root.ids.entry.text = ""
             try:
