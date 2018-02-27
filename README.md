@@ -39,7 +39,4 @@ The easiest way to do this is to run the keyboard kivy example. Depending on how
 ![alt text](Screenshot.png)   ![alt text](Screenshot2.png)
 
 # Currently in Development
-- Add MQTT username/password to connection string
 - Bug fix: Check for network connection prior to attempting connection to MQTT service
-- Add PIR service to indicate where sensors are being triggered
-- Start a screensaver after a while
